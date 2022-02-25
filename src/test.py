@@ -23,15 +23,25 @@ def test_total_duasDecucoes():
     assert simuilacao.total_deducoes == 750;  
     # assert total == dedu1 + dedu2 + dedu3    
     
-"""  @pytest.mark.parametrize("dedu1,dedu2,rend1,rend2", [(100, 200, 300, 600), (150, 220, 100, 470), (120, 340, 650, 1110)])
- def test_1_faixa(dedu1, dedu2, rend1, rend2):
+#  @pytest.mark.parametrize("dedu1,dedu2,rend1,rend2", [(100, 200, 300, 600), (150, 220, 100, 470), (120, 340, 650, 1110)])
+def test_1_faixa():
      simuilacao = simulador_IRPF.SimuladorIRPF()
-     simuilacao.cadastrar_deducao("testeDeducao", dedu1)
-     simuilacao.cadastrar_deducao("testeDeducao", dedu2)
-     simuilacao.cadastrar_rendimento("testeRendimento", rend1)
-     simuilacao.cadastrar_rendimento("testeRendimento", rend2)
-     # assert simuilacao.calcular_primeira_faixa() == 0;
-     assert 0 == 0 """
+     simuilacao.cadastrar_deducao("testeDeducao", 100)
+     simuilacao.cadastrar_deducao("testeDeducao", 200)
+     simuilacao.cadastrar_rendimento("testeRendimento", 300)
+     simuilacao.cadastrar_rendimento("testeRendimento", 600)
+     assert simuilacao.calcular_primeira_faixa() == 0;
+     #assert 0 == 0 
+
+def test_2_faixa():
+     simuilacao = simulador_IRPF.SimuladorIRPF()
+     simuilacao.cadastrar_deducao("testeDeducao", 250)
+     simuilacao.cadastrar_deducao("testeDeducao", 300)
+     simuilacao.cadastrar_rendimento("testeRendimento", 450)
+     simuilacao.cadastrar_rendimento("testeRendimento", 1000)
+     assert simuilacao.calcular_primeira_faixa() == 0;
+     #assert 0 == 0 
+
 
 """ @pytest.mark.parametrize("rendimento, pensao, res", [(100000, 10000, 23.88),(85000, 2000, 25.83),(30000, 500, 24.14)])
     def test_aliquota_efetiva(rendimento, pensao, res):
