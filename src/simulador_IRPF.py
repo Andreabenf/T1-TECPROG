@@ -115,4 +115,4 @@ class SimuladorIRPF:
         return total
 
     def calcular_aliquota_efetiva(self) -> float:
-        return 100 * (self.calcular_total_imposto()/self.total_rendimentos)
+        return round(100 * (self.calcular_total_imposto()/self.total_rendimentos),2)
