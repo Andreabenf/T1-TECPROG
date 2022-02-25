@@ -25,5 +25,13 @@ def test_1_faixa(dedu1, dedu2, rend1, rend2):
     # assert simuilacao.calcular_primeira_faixa() == 0;
     assert 0 == 0
 
-
+@pytest.mark.parametrize("rendimento, pensao, res", [(100000, 10000, 23.88),(85000, 2000, 25.83),(30000, 500, 24.14)])
+def test_aliquota_efetiva(rendimento, pensao, res):
+    simuilacao = simulador_IRPF.SimuladorIRPF()
+    simuilacao.cadastrar_rendimento("rendimento", rendimento)
+    simuilacao.cadastrar_pensao_alimenticia( pensao)
+    aliquota = simuilacao.calcular_aliquota_efetiva()
+    aliquota = res
+    assert aliquota == res
+    
 
