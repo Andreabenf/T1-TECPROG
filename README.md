@@ -14,6 +14,21 @@ TPPE - Técnicas de Programação para Plataformas Emergentes
 
 ---
 
+**Utilização**
+
+Primeiro é necessário instalar a biblioteca de testes `pytest` utilizando o comando:
+
+```bash
+pip install pytest
+```
+*Lembre de isolar o ambiente utilizando um ambiente virtual*
+
+Após finalizar a instalação basta rodar os testes presentes no arquivo `src/test.py` utilizando o comando:
+
+```bash
+pytest src/test.py
+```
+
 **Enunciado do trabalho** 
 
 Seja o seguinte cenário descrito a seguir:
