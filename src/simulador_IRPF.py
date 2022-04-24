@@ -1,3 +1,5 @@
+from typing import Union
+
 from exceptions import (DescricaoEmBrancoException,
                         ValorDeducaoInvalidoException,
                         ValorRendimentoInvalidoException,
@@ -15,47 +17,52 @@ class SimuladorIRPF:
     contribuicoes_previdenciarias = []
     dependentes = []
 
-    def cadastrar_rendimento(self, descricao: str, valor: float):
-        if descricao.strip() == "":
+    def cadastrar(self, tipo: str, valor: float, descricao: Union[str, None] = None):
+        if descricao and descricao.strip() == "":
             raise DescricaoEmBrancoException
 
         if valor <= 0:
-            raise ValorRendimentoInvalidoException
+            if tipo == 'rendimento':
+                raise ValorRendimentoInvalidoException
+            if tipo == 'deducao':
+                raise ValorDeducaoInvalidoException
 
-        rendimento = {"descricao": descricao, "valor": valor}
-        self.rendimentos.append(rendimento)
-        self.total_rendimentos += valor
+        if tipo == "rendimento":
+            if descricao:
+                rendimento = {"descricao": descricao, "valor": valor}
+                self.rendimentos.append(rendimento)
+            self.total_rendimentos += valor
 
-    def cadastrar_deducao(self, descricao: str, valor: float):
-        if descricao.strip() == "":
-            raise DescricaoEmBrancoException
+        if tipo == "deducao":
+            if descricao:
+                deducao = {"descricao": descricao, "valor": valor}
+                self.deducoes.append(deducao)
+            self.total_deducoes += valor
 
-        if valor <= 0:
-            raise ValorDeducaoInvalidoException
+    def cadastrar_rendimento(self, valor: float, descricao: Union[str, None] = None):
+        self.cadastrar(tipo='rendimento', valor=valor, descricao=descricao)
 
-        deducao = {"descricao": descricao, "valor": valor}
-        self.deducoes.append(deducao)
-        self.total_deducoes += valor
+    def cadastrar_deducao(self, valor: float, descricao: Union[str, None] = None):
+        self.cadastrar(tipo='deducao', valor=valor, descricao=descricao)
 
     def cadastrar_contribuicao_oficial(self, descricao: str, valor: float):
-        self.cadastrar_deducao(descricao, valor)
+        self.cadastrar_deducao(valor, descricao)
 
     def cadastrar_pensao_alimenticia(self, valor: float):
         if valor <= 0:
             raise ValorPensaoAlimenticiaInvalidoException
 
         self.pensoes_alimenticias.append(valor)
-        self.total_deducoes += valor
+        self.cadastrar_deducao(valor=valor)
 
     def cadastrar_dependente(self, nome: str, data_nascimento: str):
         if nome.strip() == "":
             raise NomeEmBrancoException
 
         dependente = {"nome": nome, "data_nascimento": data_nascimento}
-
-        self.dependentes.append(dependente)
-        self.total_deducoes += 189.59
         self.total_dependentes += 1
+        self.dependentes.append(dependente)
+        self.cadastrar_deducao(valor=189.59)
 
     def calcular_primeira_faixa(self) -> float:
         return 0.0
