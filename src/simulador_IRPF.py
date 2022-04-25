@@ -104,13 +104,7 @@ class SimuladorIRPF:
         return base_quarta_faixa * (22.5 / 100)
 
     def calcular_quinta_faixa(self) -> float:
-        base = self.total_rendimentos - self.total_deducoes
-        base_quinta_faixa = base - (1903.98 + 922.67 + 924.40 + 913.63)
-
-        if base_quinta_faixa <= 0:
-            return 0
-
-        return base_quinta_faixa * (27.5 / 100)
+        return Calcula5aFaixa(self).computar()
 
     def calcular_total_imposto(self):
         total = self.calcular_primeira_faixa()
@@ -123,3 +117,25 @@ class SimuladorIRPF:
 
     def calcular_aliquota_efetiva(self) -> float:
         return round(100 * (self.calcular_total_imposto()/self.total_rendimentos),2)
+
+
+class Calcula5aFaixa:
+
+    # Referencia para o objeto original
+    fonte: SimuladorIRPF
+
+    # Um atributo para cada variável temporária do método
+    base: float
+    base_quinta_faixa: float
+
+    def __init__(self, fonte: SimuladorIRPF):
+        self.fonte = fonte
+
+    def computar(self):
+        self.base = self.fonte.total_rendimentos - self.fonte.total_deducoes
+        self.base_quinta_faixa = self.base - (1903.98 + 922.67 + 924.40 + 913.63)
+
+        if self.base_quinta_faixa <= 0:
+            return 0
+
+        return self.base_quinta_faixa * (27.5 / 100)
