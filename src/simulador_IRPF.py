@@ -16,6 +16,20 @@ class SimuladorIRPF:
     pensoes_alimenticias = []
     contribuicoes_previdenciarias = []
     dependentes = []
+    valor_deducao = 189.59
+
+    # Constantes de valores referentes as faixas
+    faixa_1_min = 0.0
+    faixa_2_min = 922.67
+    faixa_3_min = 924.40
+    faixa_4_min = 913.63
+    faixa_3_max = 1903.98
+
+    # Constantes de aliquotas referente as faixas
+    aliquota_faixa_2 = 0.075
+    aliquota_faixa_3 = 0.15
+    aliquota_faixa_4 = 0.225
+    aliquota_faixa_5 = 0.275
 
     def cadastrar(self, tipo: str, valor: float, descricao: Union[str, None] = None):
         if descricao and descricao.strip() == "":
@@ -62,46 +76,47 @@ class SimuladorIRPF:
         dependente = {"nome": nome, "data_nascimento": data_nascimento}
         self.total_dependentes += 1
         self.dependentes.append(dependente)
-        self.cadastrar_deducao(valor=189.59)
+        self.cadastrar_deducao(valor=self.valor_deducao)
 
     def calcular_primeira_faixa(self) -> float:
-        return 0.0
+        return self.faixa_1_min
 
     def calcular_segunda_faixa(self) -> float:
         base = self.total_rendimentos - self.total_deducoes
-        base_segunda_faixa = base - 1903.98
+        base_segunda_faixa = base - self.faixa_3_max
 
         if base_segunda_faixa <= 0:
             return 0
 
-        if base_segunda_faixa >= 922.67:
-            return (7.5/100) * 922.67
+        if base_segunda_faixa >= self.faixa_2_min:
+            return self.aliquota_faixa_2 * self.faixa_2_min
 
-        return base_segunda_faixa * (7.5/100)
+        return base_segunda_faixa * self.aliquota_faixa_2
 
     def calcular_terceira_faixa(self) -> float:
         base = self.total_rendimentos - self.total_deducoes
-        base_terceira_faixa = base - (1903.98 + 922.67)
+        base_terceira_faixa = base - (self.faixa_3_max + self.faixa_2_min)
 
         if base_terceira_faixa <= 0:
             return 0
 
-        if base_terceira_faixa >= 924.40:
-            return (15 / 100) * 924.40
+        if base_terceira_faixa >= self.faixa_3_min:
+            return self.aliquota_faixa_3 * self.faixa_3_min
 
-        return base_terceira_faixa * (15 / 100)
+        return base_terceira_faixa * self.aliquota_faixa_3
 
     def calcular_quarta_faixa(self) -> float:
         base = self.total_rendimentos - self.total_deducoes
-        base_quarta_faixa = base - (1903.98 + 922.67 + 924.40)
+        base_quarta_faixa = base - \
+            (self.faixa_3_max + self.faixa_2_min + self.faixa_3_min)
 
         if base_quarta_faixa <= 0:
             return 0
 
-        if base_quarta_faixa >= 913.63:
-            return (22.5 / 100) * 913.63
+        if base_quarta_faixa >= self.faixa_4_min:
+            return self.aliquota_faixa_4 * self.faixa_4_min
 
-        return base_quarta_faixa * (22.5 / 100)
+        return base_quarta_faixa * self.aliquota_faixa_4
 
     def calcular_quinta_faixa(self) -> float:
         return Calcula5aFaixa(self).computar()
@@ -116,7 +131,7 @@ class SimuladorIRPF:
         return total
 
     def calcular_aliquota_efetiva(self) -> float:
-        return round(100 * (self.calcular_total_imposto()/self.total_rendimentos),2)
+        return round(100 * (self.calcular_total_imposto()/self.total_rendimentos), 2)
 
 
 class Calcula5aFaixa:
@@ -133,9 +148,11 @@ class Calcula5aFaixa:
 
     def computar(self):
         self.base = self.fonte.total_rendimentos - self.fonte.total_deducoes
-        self.base_quinta_faixa = self.base - (1903.98 + 922.67 + 924.40 + 913.63)
+        self.base_quinta_faixa = self.base - \
+            (self.fonte.faixa_3_max + self.fonte.faixa_2_min +
+             self.fonte.faixa_3_min + self.fonte.faixa_4_min)
 
         if self.base_quinta_faixa <= 0:
             return 0
 
-        return self.base_quinta_faixa * (27.5 / 100)
+        return self.base_quinta_faixa * self.fonte.aliquota_faixa_5
